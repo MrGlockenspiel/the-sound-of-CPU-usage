@@ -2,6 +2,8 @@
 What does CPU usage sound like? Like this, apparently. <br>
 To be honest, it doesn't sound that bad.
 
+Also 69 SLOC ( ͡° ͜ʖ ͡°)
+
 ## What is this
 
 This is a Python script that uses your current CPU usage to generate beautiful sounds for your listening pleasure.
