@@ -20,16 +20,8 @@ The default name for this file can be changed by changing the `outputFileName` v
 ## ~~Bugs~~ Features:
 
  - If your CPU is too good, you may just get a lot of low notes in a row. The lesson? Get a worse computer, nerd.
- - The script does not write to different MIDI tracks, even though it's supposed to, it just places them end to end on track 2 for some horrible reason.
 
 ## FAQ
-
-#### Why are there so many comments and newlines? Your style is terrible!
-I usually don't write like that, I swear! <br>
-I usually have no comments! (cry about it) <br>
-But uhhhhhhhh... <br>
-
-Check the line count ( ͡° ͜ʖ ͡°) <br>
 
 #### Why did you do this
 Yes.
