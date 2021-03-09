@@ -1,10 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
-from midiutil import MIDIFile
 import psutil
+from midiutil import MIDIFile
+import argparse
 
-
-# CONFIGURATION
+# Default Values
 
 # Set the number of notes in the output MIDI file
 midiLength = 120
@@ -17,46 +17,67 @@ outputFileName = "the-sound-of-cpu-usage.mid"
 
 # Set the MIDI tempo
 tempo = 120
+	
+# Set the number of MIDI tracks
+midiTrackCount = psutil.cpu_count()
 
-# END OF CONFIGURATION
+# Argument parsing
+parser = argparse.ArgumentParser()
+parser.add_argument("-l", "--length", help = "MIDI length in notes", type=int)
+parser.add_argument("-t", "--tracks", help = "Number of MIDI tracks", type=int)
+parser.add_argument("-T", "--tempo", help = "MIDI tempo", type=int)
+parser.add_argument("-v", "--volume", help = "MIDI volume", type=int)
+parser.add_argument("-o", "--output", help = "Output file name")
+args = parser.parse_args()
 
+# Check arguments and set values
+if args.length:
+    midiLength = args.length
+if args.tracks:
+    midiTrackCount = args.tracks
+if args.tempo:
+    tempo = args.tempo
+if args.volume:
+    volume = args.volume
+if args.output:
+    outputFileName = args.output
 
-# Define the MIDI
-MyMIDI = MIDIFile(1)
+# Define the MIDI info
+MyMIDI = MIDIFile(midiTrackCount)
 MyMIDI.addTempo(0, 0, tempo)
 
+for i in range(0, midiTrackCount):
+	print("Core #"+str(i+1))
+	MyMIDI.addTrackName(i, 0, "Core #"+str(i+1))
+
 # Define clamp function
-def clamp(n, smallest, largest): return max(smallest, min(n, largest))
+def clamp(n, smallest, largest):
+	return max(smallest, min(n, largest))
+
+def genNote(pitch_core, duration_core, track):
+	# pitch_core    = CPU core to use for note pitch
+	# duration_core = CPU core to use for note duration
+	# channel       = MIDI channel for note
+	# track         = MIDI track for note
+	
+	# Set pitch based on CPU core usage
+	pitch = int(psutil.cpu_percent(interval=0.1, percpu=True)[pitch_core])+15
+
+	# Set duration based on CPU core usage
+	duration = clamp(round(int(psutil.cpu_percent(interval=0.1, percpu=True)[duration_core])%3, 2), 0.2, 2.5)
+
+	# Push note to channel of the MIDI
+	MyMIDI.addNote(track, 0, pitch, i, duration, volume)
 
 # Loop for MIDI generation
 for i in range(1, midiLength + 1):
 	
-	# MIDI Channel 1
-	# Core 1 pitch
-	# Core 3 note duration
-
-	# Set pitch based on CPU Core 1 usage
-	pitch = int(psutil.cpu_percent(interval=0.1, percpu=True)[0])+15
-
-	# Set duration based on CPU Core 3 usage
-	duration = clamp(round(int(psutil.cpu_percent(interval=0.1, percpu=True)[2])%3, 2), 0.2, 2.5)
-
-	# Push note to channel 1 of the MIDI
-	MyMIDI.addNote(0, 0, pitch, i, duration, volume)
-
-
-	# MIDI Channel 2
-	# Core 2 pitch
-	# Core 4 note duration
-
-	# Set pitch based on CPU Core 2 usage
-	pitch = int(psutil.cpu_percent(interval=0.1, percpu=True)[1])+15
-
-	# Set duration based on CPU Core 4 usage
-	duration = clamp(round(int(psutil.cpu_percent(interval=0.1, percpu=True)[3])%3, 2), 0.2, 2.5)
-
-	# Push note to channel 2 of the MIDI
-	MyMIDI.addNote(0, 1, pitch, i, duration, volume)
+	# Generate notes
+	for a in range(0, midiTrackCount):
+		if (a < midiTrackCount-1):
+			genNote(a, a+1, a)
+		else:
+			genNote(0, midiTrackCount-1, midiTrackCount-1)
 
 	# Log completion percent
 	print("Generating MIDI - " + str(round((i/midiLength)*100)) + "% complete")
