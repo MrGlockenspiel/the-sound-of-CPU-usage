@@ -10,14 +10,10 @@ This is a Python script that uses your current CPU usage to generate beautiful s
 
 ## How to use
 
-You will need `midiutil` and `psutil`, which can be installed using 
-`pip install MIDIUtil` and `pip install psutil` respectively.
+You will need `midi2audio`, `midiutil` and `psutil`, which can be installed using 
+`pip install midi2audio`, `pip install MIDIUtil` and `pip install psutil` respectively.
 
 Then just run the script with `./the-sound-of-cpu-usage.py`.
-
-After you run the script, you will find a file named `the-sound-of-cpu-usage.mid` in the current directory. <br>
-The default name for this file can be changed by changing the `outputFileName` variable on line 16 of the script. <br>
-(Command line options and possibly MP3 output coming soon!) <br>
 
 ## ~~Bugs~~ Features:
 

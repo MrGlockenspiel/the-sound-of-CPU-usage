@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
 import psutil
+from yaml import parse
 from midiutil import MIDIFile
+from midi2audio import FluidSynth
 import argparse
+import os
 
 # Default Values
 
@@ -27,7 +30,8 @@ parser.add_argument("-l", "--length", help = "MIDI length in notes", type=int)
 parser.add_argument("-t", "--tracks", help = "Number of MIDI tracks", type=int)
 parser.add_argument("-T", "--tempo", help = "MIDI tempo", type=int)
 parser.add_argument("-v", "--volume", help = "MIDI volume", type=int)
-parser.add_argument("-o", "--output", help = "Output file name")
+parser.add_argument("-o", "--output", help = "Output file name", type=str)
+parser.add_argument("-c", "--convert-to-mp3", help = "Convert MIDI to MP3", type=bool)
 args = parser.parse_args()
 
 # Check arguments and set values
@@ -41,6 +45,7 @@ if args.volume:
     volume = args.volume
 if args.output:
     outputFileName = args.output
+convert = args.convert_to_mp3
 
 # Define the MIDI info
 MyMIDI = MIDIFile(midiTrackCount)
@@ -88,3 +93,10 @@ with open(outputFileName, "wb") as output_file:
 
 # Display output filename when done
 print("MIDI generated as \'" + outputFileName + "\'")
+
+# If MP3 conversion is enabled, convert MIDI to MP3
+if convert:
+	print("Converting MIDI to MP3...")
+	FluidSynth().midi_to_audio(outputFileName, outputFileName.replace(".mid", ".mp3"))
+	os.remove(outputFileName)
+	print("MP3 generated as \'" + outputFileName.replace(".mid", ".mp3") + "\'")
